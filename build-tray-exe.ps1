@@ -30,8 +30,9 @@ New-Item -ItemType Directory -Path $tempWorkDir | Out-Null
 
 $pythonLauncher = "python"
 $pythonArgs = @("-m", "PyInstaller", (Join-Path $projectDir "tray_app.spec"), "--noconfirm", "--clean", "--distpath", $tempDistDir, "--workpath", $tempWorkDir)
+$condaCommand = Get-Command "conda" -ErrorAction SilentlyContinue
 
-if ($CondaEnvName) {
+if ($CondaEnvName -and $null -ne $condaCommand) {
     & "conda" run -n $CondaEnvName $pythonLauncher @pythonArgs
 } else {
     & $pythonLauncher @pythonArgs

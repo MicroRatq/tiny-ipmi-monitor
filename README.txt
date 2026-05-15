@@ -29,11 +29,15 @@ Quick start:
 
    `./build-shim.ps1`
 
-3. Start the command-line bridge.
+3. Restore the LibreHardwareMonitor runtime DLLs if `lib\` is empty.
+
+   `./bootstrap-lib.ps1`
+
+4. Start the command-line bridge.
 
    `conda run -n <env-name> python monitor.py --config monitor_config.json`
 
-4. Or start the tray application.
+5. Or start the tray application.
 
    `conda run -n <env-name> python tray_app.py`
 
@@ -76,6 +80,10 @@ Build:
 
   `./build-shim.ps1`
 
+- Restore the external LibreHardwareMonitor runtime DLLs into `lib\`:
+
+  `./bootstrap-lib.ps1`
+
 - Build the final tray package into `build\tiny-ipmi-monitor\`:
 
   `./build-tray-exe.ps1`
@@ -88,3 +96,8 @@ Output:
 
 - Final packaged output is written to `build\tiny-ipmi-monitor\`.
 - The package contains the tray executable, runtime configuration, icon assets, and required external DLLs.
+
+Release automation:
+
+- GitHub Actions builds tagged releases on Windows.
+- Release assets include a packaged application ZIP and a standalone `HardwareMonitorShim.dll`.

@@ -1,0 +1,67 @@
+name: build-and-release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install Python dependencies
+        shell: pwsh
+        run: python -m pip install --upgrade pip; python -m pip install -r requirements.txt pyinstaller
+
+      - name: Restore LibreHardwareMonitor runtime DLLs
+        shell: pwsh
+        run: ./bootstrap-lib.ps1
+
+      - name: Build shim
+        shell: pwsh
+        run: ./build-shim.ps1
+
+      - name: Build packaged tray app
+        shell: pwsh
+        run: ./build-tray-exe.ps1
+
+      - name: Prepare release assets
+        shell: pwsh
+        run: |
+          Copy-Item -LiteralPath .\lib\HardwareMonitorShim.dll -Destination .\build\HardwareMonitorShim.dll -Force
+          Compress-Archive -LiteralPath .\build\tiny-ipmi-monitor -DestinationPath .\build\tiny-ipmi-monitor-windows.zip -Force
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiny-ipmi-monitor-build
+          path: |
+            build/tiny-ipmi-monitor-windows.zip
+            build/HardwareMonitorShim.dll
+
+      - name: Create or update GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build/tiny-ipmi-monitor-windows.zip
+            build/HardwareMonitorShim.dll
+          generate_release_notes: true
