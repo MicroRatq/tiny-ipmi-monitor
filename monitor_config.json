@@ -1,0 +1,14 @@
+{
+  "vendor_id": 12346,
+  "product_id": 16392,
+  "manufacturer_string": "ESPHome",
+  "product_string": "Tiny IPMI Telemetry",
+  "usage_page": 65280,
+  "usage": 1,
+  "interface_number": 1,
+  "path_contains": null,
+  "report_id": 2,
+  "report_length": 64,
+  "interval_seconds": 1.0,
+  "log_level": "INFO"
+}
